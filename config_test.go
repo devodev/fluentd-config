@@ -8,9 +8,10 @@ import (
 func TestConfigPrint(t *testing.T) {
 
 	cases := []struct {
-		Name   string
-		Plugin *Plugin
-		Want   string
+		Name    string
+		Plugin  *Plugin
+		Include *Include
+		Want    string
 	}{
 		{
 			Name:   "empty source",
@@ -32,11 +33,8 @@ func TestConfigPrint(t *testing.T) {
 				"</source>\n",
 		},
 		{
-			Name: "filter with pattern",
-			Plugin: &Plugin{
-				Name:    "filter",
-				Pattern: "**",
-			},
+			Name:   "filter with pattern",
+			Plugin: &Plugin{Name: "filter", Pattern: "**"},
 			Want: "<filter **>\n" +
 				"</filter>\n",
 		},
@@ -65,11 +63,24 @@ func TestConfigPrint(t *testing.T) {
 				"  </record>\n" +
 				"</filter>\n",
 		},
+		{
+			Name: "include",
+			Include: &Include{
+				Value: "file.conf",
+			},
+			Want: "@include file.conf\n",
+		},
 	}
 
 	for idx, c := range cases {
 		t.Run(fmt.Sprintf("%d. %s", idx, c.Name), func(t *testing.T) {
-			got := c.Plugin.Print()
+			var got string
+			if c.Include == nil {
+				got = c.Plugin.Print()
+			} else {
+				got = c.Include.Print()
+			}
+
 			if got != c.Want {
 				t.Errorf("\ngot:\n%v\nbut want:\n%v\n", got, c.Want)
 			}

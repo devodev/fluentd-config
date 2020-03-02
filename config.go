@@ -63,3 +63,13 @@ type Parameter struct {
 	Key   string
 	Value string
 }
+
+// Include .
+type Include struct {
+	Value string
+}
+
+// Print .
+func (i *Include) Print() string {
+	return fmt.Sprintf("@include %s\n", i.Value)
+}
