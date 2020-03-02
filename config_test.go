@@ -13,36 +13,57 @@ func TestConfigPrint(t *testing.T) {
 		Want   string
 	}{
 		{
-			Name: "empty source",
-			Plugin: &Plugin{
-				Name:       "source",
-				Pattern:    "",
-				Parameters: []Parameter{},
-				Blocks:     []Block{},
-			},
-			Want: "<source>\n</source>\n",
+			Name:   "empty source",
+			Plugin: &Plugin{Name: "source"},
+			Want:   "<source>\n</source>\n",
 		},
 		{
 			Name: "source with parameters",
 			Plugin: &Plugin{
-				Name:    "source",
-				Pattern: "",
+				Name: "source",
 				Parameters: []Parameter{
-					Parameter{
-						Key:   "@type",
-						Value: "forward",
-					},
-					Parameter{
-						Key:   "port",
-						Value: "24224",
-					},
+					Parameter{Key: "@type", Value: "forward"},
+					Parameter{Key: "port", Value: "24224"},
 				},
-				Blocks: []Block{},
 			},
 			Want: "<source>\n" +
 				"  @type forward\n" +
 				"  port 24224\n" +
 				"</source>\n",
+		},
+		{
+			Name: "filter with pattern",
+			Plugin: &Plugin{
+				Name:    "filter",
+				Pattern: "**",
+			},
+			Want: "<filter **>\n" +
+				"</filter>\n",
+		},
+		{
+			Name: "filter with parameters and a block",
+			Plugin: &Plugin{
+				Name:    "filter",
+				Pattern: "myapp.access",
+				Parameters: []Parameter{
+					Parameter{Key: "@type", Value: "record_transformer"},
+				},
+				Blocks: []Block{
+					Block{
+						Name:    "record",
+						Pattern: "",
+						Parameters: []Parameter{
+							Parameter{Key: "host_param", Value: "\"#{Socket.gethostname}\""},
+						},
+					},
+				},
+			},
+			Want: "<filter myapp.access>\n" +
+				"  @type record_transformer\n" +
+				"  <record>\n" +
+				"    host_param \"#{Socket.gethostname}\"\n" +
+				"  </record>\n" +
+				"</filter>\n",
 		},
 	}
 
