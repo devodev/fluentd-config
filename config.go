@@ -18,6 +18,11 @@ func (p *Plugin) Print() string {
 	b := strings.Builder{}
 
 	b.WriteString(fmt.Sprintf("<%s>\n", p.Name))
+
+	for _, param := range p.Parameters {
+		b.WriteString(fmt.Sprintf("  %s %s\n", param.Key, param.Value))
+	}
+
 	b.WriteString(fmt.Sprintf("</%s>\n", p.Name))
 
 	return b.String()
@@ -27,4 +32,7 @@ func (p *Plugin) Print() string {
 type Block struct{}
 
 // Parameter .
-type Parameter struct{}
+type Parameter struct {
+	Key   string
+	Value string
+}
