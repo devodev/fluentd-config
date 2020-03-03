@@ -91,6 +91,14 @@ func TestConfigPrint(t *testing.T) {
 func TestDocument(t *testing.T) {
 
 	stubInclude := &Include{Value: "file.conf"}
+	stubSourceEmpty := &Plugin{Name: "source"}
+	stubSourceWithParams := &Plugin{
+		Name: "source",
+		Parameters: []Parameter{
+			Parameter{Key: "@type", Value: "forward"},
+			Parameter{Key: "port", Value: "24224"},
+		},
+	}
 
 	cases := []struct {
 		Name     string
@@ -104,6 +112,28 @@ func TestDocument(t *testing.T) {
 			Name:     "document with one include",
 			Document: &Document{[]Element{stubInclude}},
 			Want:     "@include file.conf\n",
+		},
+		{
+			Name:     "document with one empty source",
+			Document: &Document{[]Element{stubSourceEmpty}},
+			Want:     "<source>\n</source>\n",
+		},
+		{
+			Name:     "document with one source with parameters",
+			Document: &Document{[]Element{stubSourceWithParams}},
+			Want: "<source>\n" +
+				"  @type forward\n" +
+				"  port 24224\n" +
+				"</source>\n",
+		},
+		{
+			Name:     "document with one source with parameters and one include",
+			Document: &Document{[]Element{stubSourceWithParams, stubInclude}},
+			Want: "<source>\n" +
+				"  @type forward\n" +
+				"  port 24224\n" +
+				"</source>\n" +
+				"@include file.conf\n",
 		},
 	}
 
