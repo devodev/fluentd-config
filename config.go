@@ -67,12 +67,22 @@ type ElementJSON struct {
 	Data json.RawMessage `json:"data"`
 }
 
+// Include .
+type Include struct {
+	Value string `json:"value"`
+}
+
+// Print .
+func (i *Include) Print() string {
+	return fmt.Sprintf("@include %s\n", i.Value)
+}
+
 // Plugin .
 type Plugin struct {
-	Name       string
-	Pattern    string
-	Parameters []Parameter
-	Blocks     []Block
+	Name       string      `json:"name"`
+	Pattern    string      `json:"pattern"`
+	Parameters []Parameter `json:"parameters"`
+	Blocks     []Block     `json:"blocks"`
 }
 
 // Print .
@@ -115,23 +125,13 @@ func (p *Plugin) Print() string {
 
 // Block .
 type Block struct {
-	Name       string
-	Pattern    string
-	Parameters []Parameter
+	Name       string      `json:"name"`
+	Pattern    string      `json:"pattern"`
+	Parameters []Parameter `json:"parameters"`
 }
 
 // Parameter .
 type Parameter struct {
-	Key   string
-	Value string
-}
-
-// Include .
-type Include struct {
-	Value string
-}
-
-// Print .
-func (i *Include) Print() string {
-	return fmt.Sprintf("@include %s\n", i.Value)
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }

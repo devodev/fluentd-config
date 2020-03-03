@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestConfigPrint(t *testing.T) {
+func TestPluginIncludePrint(t *testing.T) {
 
 	cases := []struct {
 		Name    string
@@ -91,7 +91,7 @@ func TestConfigPrint(t *testing.T) {
 	}
 }
 
-func TestDocument(t *testing.T) {
+func TestDocumentPrint(t *testing.T) {
 
 	stubInclude := &Include{Value: "file.conf"}
 	stubSourceEmpty := &Plugin{Name: "source"}
@@ -151,7 +151,7 @@ func TestDocument(t *testing.T) {
 	}
 }
 
-func TestDocumentJSON(t *testing.T) {
+func TestDocumentJSONDecode(t *testing.T) {
 
 	cases := []struct {
 		Name string
@@ -166,7 +166,26 @@ func TestDocumentJSON(t *testing.T) {
 				Elements: []Element{
 					&Include{Value: "file.conf"},
 				},
-			}},
+			},
+		},
+		{
+			Name: "document with one empty source",
+			JSON: `{"elements":[{"type":"plugin","data":{"name":"source"}}]}`,
+			Want: &Document{
+				Elements: []Element{
+					&Plugin{Name: "source"},
+				},
+			},
+		},
+		{
+			Name: "document with one source with parameters",
+			JSON: `{"elements":[{"type":"plugin","data":{"name":"source","parameters":[{"key":"@type","value":"forward"}]}}]}`,
+			Want: &Document{
+				Elements: []Element{
+					&Plugin{Name: "source", Parameters: []Parameter{Parameter{Key: "@type", Value: "forward"}}},
+				},
+			},
+		},
 	}
 
 	for idx, c := range cases {
