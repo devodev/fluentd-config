@@ -1,7 +1,10 @@
 package config
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -143,6 +146,40 @@ func TestDocument(t *testing.T) {
 
 			if got != c.Want {
 				t.Errorf("\ngot:\n%v\nbut want:\n%v\n", got, c.Want)
+			}
+		})
+	}
+}
+
+func TestDocumentJSON(t *testing.T) {
+
+	cases := []struct {
+		Name string
+		JSON string
+		Want *Document
+	}{
+		{Name: "emtpy document", JSON: `{"elements": []}`, Want: &Document{Elements: []Element{}}},
+		{
+			Name: "document with one include",
+			JSON: `{"elements": [{"type": "include", "data": {"value": "file.conf"}}]}`,
+			Want: &Document{
+				Elements: []Element{
+					&Include{Value: "file.conf"},
+				},
+			}},
+	}
+
+	for idx, c := range cases {
+		t.Run(fmt.Sprintf("%d. %s", idx, c.Name), func(t *testing.T) {
+			var got Document
+			b := bytes.NewBuffer([]byte(c.JSON))
+			err := json.NewDecoder(b).Decode(&got)
+			if err != nil {
+				t.Fatalf("error occured while decoding JSON: %v", err)
+			}
+
+			if !reflect.DeepEqual(&got, c.Want) {
+				t.Errorf("\ngot:\n%v\nbut want:\n%v\n", &got, c.Want)
 			}
 		})
 	}

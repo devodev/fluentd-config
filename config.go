@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -12,7 +13,36 @@ type Element interface {
 
 // Document .
 type Document struct {
-	Elements []Element
+	Elements []Element `json:"elements"`
+}
+
+// UnmarshalJSON .
+func (d *Document) UnmarshalJSON(b []byte) error {
+	var doc DocumentJSON
+	if err := json.Unmarshal(b, &doc); err != nil {
+		return err
+	}
+	elements := []Element{}
+	for _, e := range doc.Elements {
+		switch e.Type {
+		case "plugin":
+			var elem Plugin
+			if err := json.Unmarshal(e.Data, &elem); err != nil {
+				return err
+			}
+			elements = append(elements, &elem)
+		case "include":
+			var elem Include
+			if err := json.Unmarshal(e.Data, &elem); err != nil {
+				return err
+			}
+			elements = append(elements, &elem)
+		default:
+			return fmt.Errorf("unsupported element type: %s", e.Type)
+		}
+	}
+	*d = Document{elements}
+	return nil
 }
 
 // Print .
@@ -24,6 +54,17 @@ func (d *Document) Print() string {
 	}
 
 	return b.String()
+}
+
+// DocumentJSON .
+type DocumentJSON struct {
+	Elements []ElementJSON `json:"elements"`
+}
+
+// ElementJSON .
+type ElementJSON struct {
+	Type string          `json:"type"`
+	Data json.RawMessage `json:"data"`
 }
 
 // Plugin .
