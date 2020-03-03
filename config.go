@@ -5,6 +5,27 @@ import (
 	"strings"
 )
 
+// Element .
+type Element interface {
+	Print() string
+}
+
+// Document .
+type Document struct {
+	Elements []Element
+}
+
+// Print .
+func (d *Document) Print() string {
+	b := strings.Builder{}
+
+	for _, e := range d.Elements {
+		b.WriteString(e.Print())
+	}
+
+	return b.String()
+}
+
 // Plugin .
 type Plugin struct {
 	Name       string

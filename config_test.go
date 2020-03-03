@@ -87,3 +87,33 @@ func TestConfigPrint(t *testing.T) {
 		})
 	}
 }
+
+func TestDocument(t *testing.T) {
+
+	stubInclude := &Include{Value: "file.conf"}
+
+	cases := []struct {
+		Name     string
+		Document *Document
+		Want     string
+	}{
+		{
+			Name: "emtpy document", Document: &Document{}, Want: "",
+		},
+		{
+			Name:     "document with one include",
+			Document: &Document{[]Element{stubInclude}},
+			Want:     "@include file.conf\n",
+		},
+	}
+
+	for idx, c := range cases {
+		t.Run(fmt.Sprintf("%d. %s", idx, c.Name), func(t *testing.T) {
+			got := c.Document.Print()
+
+			if got != c.Want {
+				t.Errorf("\ngot:\n%v\nbut want:\n%v\n", got, c.Want)
+			}
+		})
+	}
+}
